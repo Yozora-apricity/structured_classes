@@ -2,68 +2,87 @@ import sys
 import time
 from datetime import datetime
 
-# Auto Reindex Function
-def auto_reindex_questions():
-    try:
-        with open('questions.txt', 'r') as file:
-            content = file.read().strip()
+class QuizManager:
+    def __init__(self, filename='questions.txt'):
+        self.filename = filename
+        self.auto_reindex_questions()
+        
+    def auto_reindex_questions(self):
+        try:
+            with open(self.filename, 'r') as file:
+                content = file.read().strip()
 
-        if not content:
+            if not content:
+                return
+
+            blocks = content.split('--- Question')
+            updated_blocks = []
+            question_number = 1
+
+            for block in blocks:
+                if block.strip() == "":
+                    continue
+                lines = block.strip().split('\n')
+                for i, line in enumerate(lines):
+                    if line.startswith('Q'):
+                        parts = line.split(':', 1)
+                        if len(parts) > 1:
+                            lines[i] = f"Q{question_number}: {parts[1].strip()}"
+                reindexed_block = f"--- Question {question_number} ---\n" + '\n'.join(lines)
+                updated_blocks.append(reindexed_block)
+                question_number += 1
+
+            with open(self.filename, 'w') as file:
+                file.write('\n\n'.join(updated_blocks) + '\n')   
+        except FileNotFoundError:
             return
 
-        blocks = content.split('--- Question')
-        updated_blocks = []
-        question_number = 1
-
-        for block in blocks:
-            if block.strip() == "":
-                continue
-
-            lines = block.strip().split('\n')
-            for i, line in enumerate(lines):
-                if line.startswith('Q'):
-                    parts = line.split(':', 1)
-                    if len(parts) > 1:
-                        lines[i] = f"Q{question_number}: {parts[1].strip()}"
-            reindexed_block = f"--- Question {question_number} ---\n" + '\n'.join(lines)
-            updated_blocks.append(reindexed_block)
-            question_number += 1
-
-        with open('questions.txt', 'w') as file:
-            file.write('\n\n'.join(updated_blocks) + '\n')
-
-    except FileNotFoundError:
-        return
-
-def main_menu():
-    print("\n\033[32mWelcome to the Main Menu!\033[0m")
-    print("1. \033[34m[📝] Create Questions\033[0m")
-    print("2. \033[35m[💻] Developer Info\033[0m")
-    print("3. \033[33m[📚] See Questions\033[0m")
-    print("4. \033[36m[⚙️ ] Manage Questions\033[0m")
-    print("5. \033[91m[🚪] Exit Like a Legend\033[0m")
+    def loading_bar(self, duration):
+        for i in range(0, 101, 2):
+            time.sleep(duration / 50)
+            if i < 30:
+                color = "\033[31m"
+            elif i < 60:
+                color = "\033[33m"
+            elif i < 90:
+                color = "\033[34m"
+            else:
+                color = "\033[32m"
+            bar = '=' * (i // 2)
+            spaces = ' ' * (50 - i // 2)
+            sys.stdout.write(f"\r{color}[{bar}{spaces}] {i}%")
+            sys.stdout.flush()
+        print()
+        
+    def main_menu(self):
+        print("\n\033[32mWelcome to the Main Menu!\033[0m")
+        print("1. \033[34m[📝] Create Questions\033[0m")
+        print("2. \033[35m[💻] Developer Info\033[0m")
+        print("3. \033[33m[📚] See Questions\033[0m")
+        print("4. \033[36m[⚙️ ] Manage Questions\033[0m")
+        print("5. \033[91m[🚪] Exit Like a Legend\033[0m")
     
-    choice = input("\033[97mEnter your choice 1-5: \033[0m")
-    if choice == '1':
-        create_quiz()
-    elif choice == '2':
-        developer_info()
-    elif choice == '3':
-        see_questions()
-    elif choice == '4':
-        manage_questions()
-    elif choice == '5':
-        print("\033[97mGoodbye! 😊\033[0m")
+        choice = input("\033[97mEnter your choice 1-5: \033[0m")
+        if choice == '1':
+            create_quiz()
+        elif choice == '2':
+            developer_info()
+        elif choice == '3':
+            see_questions()
+        elif choice == '4':
+            manage_questions()
+        elif choice == '5':
+            print("\033[97mGoodbye! 😊\033[0m")
         exit()
     else:
         print("\033[97mInvalid choice. Please try again.\033[0m")
         main_menu()
 
-def developer_info():
-    print("\nDeveloper: \033[96mGerald Tan Rogado\033[0m")
-    print("Email: \033[95mgeraldtanrogado@gmail.com\033[0m")
-    print("Github Profile: \033[33m"
-          "https://github.com/Yozora-apricity\033[0m")
+    def developer_info():
+        print("\nDeveloper: \033[96mGerald Tan Rogado\033[0m")
+        print("Email: \033[95mgeraldtanrogado@gmail.com\033[0m")
+        print("Github Profile: \033[33m"
+            "https://github.com/Yozora-apricity\033[0m")
 
     while True:
         choice = input("\nWould you like to go back to the main menu? (y/n): ").lower()
@@ -76,19 +95,19 @@ def developer_info():
         else:
             print("Invalid input. Please enter 'y' or 'n'.")
 
-def get_next_question_number():
-    try:
-        with open('questions.txt', 'r') as file:
-            lines = file.readlines()
-            return len([line for line in lines if line.startswith('Q')]) + 1
-    except FileNotFoundError:
-        return 0
+    def get_next_question_number(self):
+        try:
+            with open('questions.txt', 'r') as file:
+                lines = file.readlines()
+                return len([line for line in lines if line.startswith('Q')]) + 1
+        except FileNotFoundError:
+            return 0
 
-def create_quiz():
-    print("\n--- Create Quiz Questions ---")
-    with open('questions.txt', 'a') as file:
-        while True:
-        #Ask for question and options
+    def create_quiz():
+        print("\n--- Create Quiz Questions ---")
+        with open('questions.txt', 'a') as file:
+            while True:
+            #Ask for question and options
             question = input("Enter question: ")
             a = input("Enter option a: ")
             b = input("Enter option b: ")
@@ -236,28 +255,6 @@ def delete_specific_question(content):
     except ValueError:
         print("Invalid input. Please enter a valid number.")
         manage_questions()
-        
-# Simulated loading bar with progressN  
-def loading_bar(duration):
-    for i in range(0, 101, 2):  # Update progress bar every 2%
-        time.sleep(duration / 50)
-        
-        #Add Color to the loading bar
-        if i < 30:
-             color = "\033[31m"  # Red for 0-29%
-        elif i < 60:
-            color = "\033[33m"  # Yellow for 30-59%
-        elif i < 90:
-            color = "\033[34m"  # Blue for 60-89%
-        else:
-            color = "\033[32m" # Green for 90-100%
-        
-        #Display the loading bar
-        bar = '=' * (i // 2)  
-        spaces = ' ' * (50 - i // 2)
-        sys.stdout.write(f"\r{color}[{bar}{spaces}] {i}%") 
-        sys.stdout.flush()
-    print()
 
 auto_reindex_questions()    
 main_menu()
