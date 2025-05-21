@@ -6,7 +6,7 @@ class QuizManager:
     def __init__(self, filename='questions.txt'):
         self.filename = filename
         self.auto_reindex_questions()
-        
+
     def auto_reindex_questions(self):
         try:
             with open(self.filename, 'r') as file:
@@ -33,7 +33,7 @@ class QuizManager:
                 question_number += 1
 
             with open(self.filename, 'w') as file:
-                file.write('\n\n'.join(updated_blocks) + '\n')   
+                file.write('\n\n'.join(updated_blocks) + '\n')
         except FileNotFoundError:
             return
 
@@ -48,12 +48,12 @@ class QuizManager:
                 color = "\033[34m"
             else:
                 color = "\033[32m"
-                bar = '=' * (i // 2)
-                spaces = ' ' * (50 - i // 2)
-                sys.stdout.write(f"\r{color}[{bar}{spaces}] {i}%")
-                sys.stdout.flush()
-            print()
-        
+            bar = '=' * (i // 2)
+            spaces = ' ' * (50 - i // 2)
+            sys.stdout.write(f"\r{color}[{bar}{spaces}] {i}%")
+            sys.stdout.flush()
+        print()
+
     def main_menu(self):
         print("\n\033[32mWelcome to the Main Menu!\033[0m")
         print("1. \033[34m[📝] Create Questions\033[0m")
@@ -61,7 +61,7 @@ class QuizManager:
         print("3. \033[33m[📚] See Questions\033[0m")
         print("4. \033[36m[⚙️ ] Manage Questions\033[0m")
         print("5. \033[91m[🚪] Exit Like a Legend\033[0m")
-    
+
         choice = input("\033[97mEnter your choice 1-5: \033[0m")
         if choice == '1':
             self.create_quiz()
@@ -73,75 +73,65 @@ class QuizManager:
             self.manage_questions()
         elif choice == '5':
             print("\033[97mGoodbye! 😊\033[0m")
-        exit()
-    else:
-        print("\033[97mInvalid choice. Please try again.\033[0m")
-        self.main_menu()
+            exit()
+        else:
+            print("\033[97mInvalid choice. Please try again.\033[0m")
+            self.main_menu()
 
     def developer_info(self):
         print("\nDeveloper: \033[96mGerald Tan Rogado\033[0m")
         print("Email: \033[95mgeraldtanrogado@gmail.com\033[0m")
-        print("Github Profile: \033[33m"
-            "https://github.com/Yozora-apricity\033[0m")
+        print("Github Profile: \033[33mhttps://github.com/Yozora-apricity\033[0m")
 
-    while True:
-        choice = input("\nWould you like to go back to the main menu? (y/n): ").lower()
-        if choice == 'y':
-            self.main_menu()
-            break
-        elif choice == 'n':
-            print("\033[97mGoodbye! 😊\033[0m")
-            exit()
-        else:
-            print("Invalid input. Please enter 'y' or 'n'.")
+        while True:
+            choice = input("\nWould you like to go back to the main menu? (y/n): ").lower()
+            if choice == 'y':
+                self.main_menu()
+                break
+            elif choice == 'n':
+                print("\033[97mGoodbye! 😊\033[0m")
+                exit()
+            else:
+                print("Invalid input. Please enter 'y' or 'n'.")
 
     def get_next_question_number(self):
         try:
-            with open('questions.txt', 'r') as file:
+            with open(self.filename, 'r') as file:
                 lines = file.readlines()
                 return len([line for line in lines if line.startswith('Q')]) + 1
         except FileNotFoundError:
-            return 0
+            return 1
 
     def create_quiz(self):
         print("\n--- Create Quiz Questions ---")
-        with open('questions.txt', 'a') as file:
+        with open(self.filename, 'a') as file:
             while True:
-            #Ask for question and options
                 question = input("Enter question: ")
                 a = input("Enter option a: ")
                 b = input("Enter option b: ")
                 c = input("Enter option c: ")
                 d = input("Enter option d: ")
-        
-            #Ask for correct answer
+
                 correct = input("Enter the correct answer (a-d): ").lower()
                 while correct not in {'a', 'b', 'c', 'd'}:
                     print("Invalid answer! Please enter a, b, c, or d.")
                     correct = input("Enter the correct answer (a-d): ").lower()
-            
+
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 question_number = self.get_next_question_number()
-            
-            # Write to file with progress bar
+
                 print("\nSaving your question...")
                 self.loading_bar(3)
-            
-            # Write file to make it more readable
+
                 file.write(f'\n--- Question {question_number} ---\n')
                 file.write(f'Q{question_number}: {question}\n')
-                file.write(f"A) {a}\n")
-                file.write(f"B) {b}\n")
-                file.write(f"C) {c}\n")
-                file.write(f"D) {d}\n")
+                file.write(f"A) {a}\nB) {b}\nC) {c}\nD) {d}\n")
                 file.write(f"ANSWER: {correct}\n")
                 file.write(f"--- Added on {timestamp} ---\n\n")
-        
-             # Check if user wants to continue
+
                 if input("\nAdd another question? (y/n): ").lower() != 'y':
                     print("\nQuestions saved to questions.txt")
                     break
-
         self.main_menu()
 
     def see_questions(self):
@@ -149,13 +139,13 @@ class QuizManager:
         try:
             with open(self.filename, 'r') as file:
                 content = file.read()
-                if content.strip(): # Check if file is not empty or spaces
+                if content.strip():
                     print(content)
                 else:
                     print("No questions available.")
         except FileNotFoundError:
             print("No questions have been added yet.")
-        
+
         while True:
             choice = input("\nWould you like to go back to the main menu? (y/n): ").lower()
             if choice == 'y':
@@ -170,62 +160,55 @@ class QuizManager:
     def manage_questions(self):
         print("\n--- Manage Questions ---")
         try:
-            with open('questions.txt', 'r') as file:
+            with open(self.filename, 'r') as file:
                 content = file.readlines()
-
             if not content:
                 print("No questions available.")
                 return
-        
-        print("\nCurrent Questions:")
-        question_num = 1
-        for line in content:
-            if line.startswith('Q'):
-                print(f"{question_num}. {line.strip()}")
-                question_num += 1
-                
-        print("\nOptions:")
-        print("1. \033[31m[🗑️ ] Delete all questions\033[0m")
-        print("2. \033[38;5;214m[❌] Delete a specific question\033[0m")
-        print("3.[🔙] Go back to the main menu")
 
-        choice = input("\033[97mEnter your choice (1-3): \033[0m")
+            question_num = 1
+            for line in content:
+                if line.startswith('Q'):
+                    print(f"{question_num}. {line.strip()}")
+                    question_num += 1
 
-        if choice == '1':
-            self.delete_all_questions()
-        elif choice == '2':
-            self.delete_specific_question(content)
-        elif choice == '3':
-            self.main_menu()
-        else:
-            print("Invalid choice. Please try again.")
-            self.manage_questions()
-    except FileNotFoundError:
-        print("No questions have been added yet.")
+            print("\nOptions:")
+            print("1. \033[31m[🗑️ ] Delete all questions\033[0m")
+            print("2. \033[38;5;214m[❌] Delete a specific question\033[0m")
+            print("3.[🔙] Go back to the main menu")
 
-# Delete all questions
+            choice = input("\033[97mEnter your choice (1-3): \033[0m")
+            if choice == '1':
+                self.delete_all_questions()
+            elif choice == '2':
+                self.delete_specific_question(content)
+            elif choice == '3':
+                self.main_menu()
+            else:
+                print("Invalid choice. Please try again.")
+                self.manage_questions()
+        except FileNotFoundError:
+            print("No questions have been added yet.")
+
     def delete_all_questions(self):
         confirm = input("Are you sure you want to delete all questions? (y/n): ").lower()
         if confirm == 'y':
             print("Deleting all questions...")
-            self.loading_bar(5)  # Adding a 5-second delay with loading bar
-            with open('questions.txt', 'w') as file:
+            self.loading_bar(5)
+            with open(self.filename, 'w') as file:
                 file.truncate(0)
             print("All questions have been deleted.")
         else:
             print("No questions were deleted.")
         self.main_menu()
 
-#Delete a specific question
     def delete_specific_question(self, content):
         try:
             question_num = int(input("Enter the question number to delete: "))
             question_start = f'Q{question_num}:'
-        
-            #Find all lines related to the question number
             question_lines = []
             question_block = False
-        
+
             for idx, line in enumerate(content):
                 if line.startswith(question_start):
                     question_block = True
@@ -233,29 +216,26 @@ class QuizManager:
                     question_lines.append(line)
                 if question_block and line.startswith("---"):
                     question_block = False
-                break
-            
-        #Check if the question exists
+                    break
+
             if not question_lines:
                 print(f'Question {question_num} does not exist.')
                 return
-        
-        #Filter out the question block from the content
+
             filtered_content = [line for line in content if line not in question_lines]
-        
-        #Save updated content to file
+
             print(f"Deleting question {question_num}...")
-            self.loading_bar(3) # Adding a 3-second delay with loading bar
-            with open('questions.txt', 'w') as file:
+            self.loading_bar(3)
+            with open(self.filename, 'w') as file:
                 file.writelines(filtered_content)
-            
+
             print(f"Question {question_num} has been deleted.")
             self.manage_questions()
-        
         except ValueError:
             print("Invalid input. Please enter a valid number.")
             self.manage_questions()
 
-if __name__ == "__main__":
-    quiz_manager = QuizManager()
-    quiz_manager.main_menu()
+
+if __name__ == '__main__':
+    quiz_app = QuizManager()
+    quiz_app.main_menu()
