@@ -22,33 +22,33 @@ class QuestionLoader:
                     if question_block.strip() == "":
                         continue
 
-                lines = question_block.strip().split("\n")
-                question_data = {}
+                    lines = question_block.strip().split("\n")
+                    question_data = {}
 
-                for line in lines:
-                    if line.startswith('Q'):
-                        question_data['question'] = line.split(':', 1)[1].strip()
-                    elif line.startswith('A)'):
-                        question_data['option_a'] = line[3:].strip()
-                    elif line.startswith('B)'):
-                        question_data['option_b'] = line[3:].strip()
-                    elif line.startswith('C)'):
-                        question_data['option_c'] = line[3:].strip()
-                    elif line.startswith('D)'):
-                        question_data['option_d'] = line[3:].strip()
-                    elif line.startswith('ANSWER:'):
-                        question_data['correct_answer'] = line.split(':')[1].strip().lower()
+                    for line in lines:
+                        if line.startswith('Q'):
+                            question_data['question'] = line.split(':', 1)[1].strip()
+                        elif line.startswith('A)'):
+                            question_data['option_a'] = line[3:].strip()
+                        elif line.startswith('B)'):
+                            question_data['option_b'] = line[3:].strip()
+                        elif line.startswith('C)'):
+                            question_data['option_c'] = line[3:].strip()
+                        elif line.startswith('D)'):
+                            question_data['option_d'] = line[3:].strip()
+                        elif line.startswith('ANSWER:'):
+                            question_data['correct_answer'] = line.split(':')[1].strip().lower()
 
-                if question_data:
-                    question_list.append(question_data)
+                    if question_data:
+                        question_list.append(question_data)
 
-        return question_list
+            return question_list
 
-    except FileNotFoundError:
-        messagebox.showerror("Error", "Quiz File not found.")
-        return []
+        except FileNotFoundError:
+            messagebox.showerror("Error", "Quiz File not found.")
+            return []
 
-class :
+class QuizInterface:
     def __init__(self, window, questions_list):
         self.window = window
         self.window.title("Quiz Game")
@@ -182,10 +182,11 @@ class :
             self.display_final_score()
 
 def main():
-    question_list = load_questions()
-    if question_list:
+    loader = QuestionLoader()
+    question = loader.load_questions()
+    if question:
         root = tk.Tk()
-        quiz_app = QuizApp(root, question_list)
+        quiz_ui = QuizInterface(root, question)
         root.mainloop()
 
 if __name__ == "__main__":
